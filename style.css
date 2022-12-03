@@ -1,25 +1,77 @@
-html, body {
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-
-html {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  height: 100%;
+body{
+  width: 100vw;
+  height: 100vh;
 }
-
-body {
-  overflow: hidden;
-  height: inherit;
-}
-
-h1 {
-  font-size: 2rem;
-  letter-spacing: -1px;
+.grid {
+  display: grid;
   position: absolute;
-  margin: 0;
-  top: -4px;
-  right: 5px;
+  top: calc(50% - 37.5vmin);
+  left: calc(50% - 37.5vmin);
+  width: 75vmin;
+  height: 75vmin;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+}
 
-  color: transparent;
-  text-shadow: 0 0 4px white;
+.grid>div {
+  border: solid black 1px;
+  grid-column: auto;
+  grid-row: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 17vmin;
+  overflow: hidden;
+}
+
+.output {
+  position: absolute;
+  top: calc(50% - 37.5vmin);
+  left: calc(50% + 37.5vmin);
+  border: solid black 1px;
+  width: 25vmin;
+  height: 75vmin;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  overflow: auto;
+}
+.settings {
+  position: absolute;
+  top: calc(50% - 37.5vmin);
+  left: calc(50% - 62.5vmin);
+  width: 25vmin;
+  height: 75vmin;
+  border: solid black 1px;
+}
+form {
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  padding: 1vmin;
+}
+.marker {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+label {
+  margin: 0 1vmin;
+}
+input {
+  text-align: center;
+}
+.container{
+  border: 1px solid black;
+  margin: 1vmin 0;
+  border-radius: 1vmin;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
 }

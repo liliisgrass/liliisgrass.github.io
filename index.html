@@ -3,14 +3,46 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>balls</title>
+    <title>tic-tac-toe</title>
     <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
   </head>
-
   <body>
-    <h1>imagine dragon these balls</h1>
-    <canvas></canvas>
-
-    <script src="script.js"></script>
+    <div class = "grid">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <div class = "output"></div>
+    <div class = "settings">
+      <form>
+        <div class="container">
+          <div class = "marker">
+            <label for="p1">P1: </label>
+            <input type="text" id="p1" value="X" size="1">
+          </div>
+          <div class = "marker">
+            <label for="p2">P2: </label>
+            <input type="text" id="p2" value="O" size="1">
+          </div>
+        </div>
+        <div class="container">
+          <div>
+            <input type="radio" name="players" value="1" id="one">
+            <label for="one">1P</label>
+          </div>
+          <div>
+            <input type="radio" checked name="players" value="2" id="two">
+            <label for="two">2P</label>
+          </div>
+        </div>
+      </form>
+    </div>
   </body>
 </html>

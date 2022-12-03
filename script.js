@@ -1,133 +1,228 @@
-// setup canvas
+const output = document.querySelector(".output");
 
-const canvas = document.querySelector('canvas');
-const ctx = canvas.getContext('2d');
+const cells = document.querySelectorAll(".grid>div")
 
-window.addEventListener("resize", () =>{
-    const width = canvas.width = window.innerWidth;
-    const height = canvas.height = window.innerHeight;
-})
+let turn = true;
 
-const width = canvas.width = window.innerWidth;
-const height = canvas.height = window.innerHeight;
+function rand(min, max){
+    const range = max - min;
+    return Math.floor(Math.random() * range + min);
+}
 
-// function to generate random number
+const Settings = () => {
+    let p1 = "X";
+    let p2 = "O";
+    const p1input = document.querySelector("#p1");
+    const p2input = document.querySelector("#p2");
+    p1input.addEventListener("input", (e) => {
+        settings.p1 = e.target.value;
+        grid.reset();
+        turn = true;
+    });
+    p2input.addEventListener("input", (e) => {
+        settings.p2 = e.target.value;
+        grid.reset();
+        turn = true;
+    });
+    let players = 2;
+    const one = document.querySelector("#one");
+    const two = document.querySelector("#two");
+    one.addEventListener("change", () => {
+        settings.players = 1;
+        grid.reset();
+        turn = true;
+    })
+    two.addEventListener("change", () => {
+        settings.players = 2;
+        grid.reset();
+        turn = true;
+    })
+    return {p1, p2, players};
+}
+const settings = Settings();
 
-function hasCommonElements(array1, array2){
-    for (item1 of array1){
-        for (item2 of array2){
-            if (item1 === item2){
-                return true;
+const Grid = () => {
+    let content = [,,,,,,,,]
+    const reset = () => {
+        grid.content = [,,,,,,,,];
+        for (const cell of cells){
+            cell.textContent = "";
+        }
+    };
+    const tie = () => {
+        let i = 0;
+        for (const cell of grid.content){
+            if (cell){
+                i = i + 1;
+            }
+        }
+        if (i === 9){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    const checkWin = (players = [settings.p1, settings.p2]) => {
+        for (const player of players){
+            //rows
+            if (grid.content[0] == grid.content[1] && grid.content[1] == grid.content[2] && grid.content[2] == player){
+                return player;
+            } else if (grid.content[3] == grid.content[4] && grid.content[4] == grid.content[5] && grid.content[5] == player){
+                return player;
+            } else if (grid.content[6] == grid.content[7] && grid.content[7] == grid.content[8] && grid.content[8] == player){
+                return player;
+            //diagonals
+            } else if (grid.content[0] == grid.content[4] && grid.content[4] == grid.content[8] && grid.content[8] == player){
+                return player;
+            } else if (grid.content[2] == grid.content[4] && grid.content[4] == grid.content[6] && grid.content[6] == player){
+                return player;
+            //columns
+            } else if (grid.content[0] == grid.content[3] && grid.content[3] == grid.content[6] && grid.content[6] == player){
+                return player;
+            } else if (grid.content[1] == grid.content[4] && grid.content[4] == grid.content[7] && grid.content[7] == player){
+                return player;
+            } else if (grid.content[2] == grid.content[5] && grid.content[5] == grid.content[8] && grid.content[8] == player){
+                return player;
+            } else if (tie()){
+                return "tie";
+            }
+        }
+        return null;
+    }
+    const gameOver = () => {
+        if (checkWin() !== null){
+            const gameInfo = document.createElement("p");
+            gameInfo.style = "font-size: 5vmin";
+            if (checkWin() == "tie"){
+                gameInfo.textContent = "tie";
+            } else {
+                gameInfo.textContent = `${checkWin()} wins`;
+            }
+            output.appendChild(gameInfo);
+            reset();
+
+            if (settings.players == 1 && turn == false){
+                grid.playBestMove();
+                turn = true;
             }
         }
     }
-    return false;
-}
 
-function random(minmax, exclude = []) {
-    const range = [];
-    for (let i = minmax[0]; i <= minmax[1]; i++){
-        range.push(i);
-    }
-    let i = 0;
-    while (i < exclude.length){
-        for (const number of range){
-            if (number === exclude[i]){
-                range.splice(range.indexOf(number), 1);
-            }
-        }
-        i++;
-    }
-        const num = Math.floor(Math.random() * (range.length));
-        return range[num];
-}
-
-// function to generate random color
-
-function randomRGB() {
-  return `rgb(${random([0, 255])},${random([0, 255])},${random([0, 255])})`;
-}
-
-class Ball{
-    constructor (x, y, xVel, yVel, color, size){
-        this.x = x;
-        this.y = y;
-        this.xVel = xVel;
-        this.yVel = yVel;
-        this.color = color;
-        this.size = size;
-    }
-    draw(){
-        ctx.beginPath();
-        ctx.fillStyle = this.color;
-        ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
-        ctx.fill();
-    }
-    update(){
-        if ((this.x + this.size) >= width){
-            this.xVel = -(this.xVel);
-        }
-        if ((this.x + this.size) <= 0){
-            this.xVel = -(this.xVel);
-        }
-        if ((this.y + this.size) >= height) {
-            this.yVel = -(this.yVel);
-        }
-        
-        if ((this.y - this.size) <= 0) {
-            this.yVel = -(this.yVel);
-        }
-        
-        this.x += this.xVel;
-        this.y += this.yVel;
-        
-    }
-    collisionDetect(){
-        for (const ball of balls){
-            if (this !== ball) {
-                const dx = this.x - ball.x;
-                const dy = this.y - ball.y;
-                const distance = Math.pow((Math.pow(dx, 2) + Math.pow(dy, 2)), 0.5);
-
-            if (distance < this.size + ball.size){
-                this.xVel = (ball.yVel);
-                ball.xVel = (this.yVel);
-                ball.yVel = (this.xVel);
-                this.yVel = (ball.xVel);
+    const minimax = (isMax, moves = 0, a, b) => {
+        moves++;
+        let score = checkWin();
+        if (score == settings.p2){
+            return 25 - moves;
+        } else if (score == "tie"){
+            return 0 - moves;
+        } else if (score == settings.p1){
+            return -25 + moves;
+        } else {
+            if (isMax){
+                let best = -50;
+                for (let i = 0; i <= 8; i++){
+                    if(!grid.content[i]){
+                        grid.content[i] = settings.p2;
+                        best = Math.max(best, minimax(!isMax));
+                        a = Math.max(a, best);
+                        grid.content[i] = null;
+                        if (b <= a){
+                            break;
+                        }
+                    }
+                }   
+                return best;
+            } else {
+                let best = 50;
+                for (let i = 0; i <= 8; i++){
+                    if(!grid.content[i]){
+                        grid.content[i] = settings.p1;
+                        best = Math.min(best, minimax(!isMax));
+                        b = Math.min(b, best);
+                        grid.content[i] = null;
+                        if (b <= a){
+                            break;
+                        }
+                    }
                 }
+                return best;
             }
         }
     }
-}
-
-const balls = [];
-
-while (balls.length < 10){
-    const size = random([10, 20]);
-    const ball = new Ball(
-        random([0 + size, width - size]),
-        random([0 + size, height - size]),
-        random([-7, 7]),
-        random([-7, 7]),
-        randomRGB(),
-        size
-    );
-
-    balls.push(ball)
-}
-
-function loop() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
-    ctx.fillRect(0, 0, width, height);
-  
-    for (const ball of balls) {
-      ball.draw();
-      ball.update();
-      ball.collisionDetect();
+    const playBestMove = () => {
+        let bestVal = -2;
+        let bestMove = -1;
+        for (let i = 0; i <= 8; i++){
+            if (!grid.content[i]){
+                grid.content[i] = settings.p2;
+                let moveVal = minimax(false);
+                if (moveVal > bestVal){
+                    bestVal = moveVal;
+                    bestMove = i;
+                }
+                grid.content[i] = null;
+            }
+        }
+        grid.content[bestMove] = settings.p2;
+        cells[bestMove].textContent = settings.p2;
     }
-  
-    requestAnimationFrame(loop);
-  }
 
-  loop();
-  
+    return {gameOver, reset, content, checkWin, playBestMove}
+}
+
+const grid = Grid();
+
+const Cell = (position, element) => {
+    const place = () => {
+        if (turn == true && !grid.content[position]){
+            element.textContent = settings.p1;
+            grid.content[position] = settings.p1;
+            turn = false;
+            if (settings.players == 1 && grid.checkWin() == null){
+                grid.playBestMove();
+                turn = true;
+            }
+        } else if (turn == false && !grid.content[position]){
+            element.textContent = settings.p2;
+            grid.content[position] = settings.p2;
+            turn = true;
+        }
+        grid.gameOver();
+    }
+    return {position, place, element, turn};
+}
+
+for (i = 0; i <= 8; i++){
+    const cell = Cell(i, cells[i]);
+    cell.element.addEventListener("click", cell.place);
+}
+
+function baseConvert(num, targetBase){
+    const findLargestDigit = (n) => {
+        let i = 0;
+        while (n >= Math.pow(targetBase, i)){
+            i++;
+        };
+        return (i - 1);
+    };
+
+    const digitValue = (power) => {
+        let i = 1;
+        while (num >= Math.pow(targetBase, power) * i){
+            i++;
+        };
+        return (i - 1);
+    };
+
+    let output = 0;
+    for (let i = findLargestDigit(num); i >= 0; i--){
+        let val = digitValue(i);
+        if (val == 0){
+            output = output * 10;
+        } else {
+            output = (output * 10) + val;
+            num = num - (Math.pow(targetBase, i) * val);
+        }
+    }
+    return output;
+}
